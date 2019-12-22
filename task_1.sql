@@ -1,3 +1,12 @@
+-- DROP TABLE response;
+-- DROP TABLE resume_to_specialization;
+-- DROP TABLE resume_to_language_skill;
+-- DROP TABLE language_skill;
+-- DROP TABLE resume_to_skill;
+-- DROP TABLE resume_to_work_experience;
+-- DROP TABLE work_experience;
+-- DROP TABLE resume_to_user_citizenship;
+-- DROP TABLE resume;
 -- DROP TABLE vacancy_body_to_contact;
 -- DROP TABLE contact;
 -- DROP TABLE vacancy_body_to_skill;
@@ -124,4 +133,98 @@ CREATE TABLE vacancy_body_to_contact (
 	vacancy_body_to_contact 			serial 			PRIMARY KEY,
 	vacancy_body_id						integer 		REFERENCES vacancy_body(vacancy_body_id),
 	contact_id 							integer 		REFERENCES contact(contact_id)
+);
+
+CREATE TABLE resume (
+	resume_id 							serial 			PRIMARY KEY,
+    creation_time 						timestamp 		NOT NULL,
+    expire_time 						timestamp 		NOT NULL,
+
+	user_lastname						varchar(250)	NOT NULL,
+	user_firstname						varchar(250)	NOT NULL,
+	user_middlename						varchar(250),
+
+	user_phone							varchar(20),
+	user_email							varchar(50),
+
+    area_id 							integer,
+
+	user_birthdate						date,
+	user_sex							boolean			NOT NULL,
+	user_citizenship					integer[],
+
+	education_level						integer			NOT NULL,
+	no_experience_reason				text,
+
+	for_position						varchar(200)	NOT NULL,
+	compensation						bigint,
+
+	description							text			NOT NULL,
+
+    work_schedule_type 					integer,
+    employment_type 					integer,
+	ready_for_move						boolean,
+	owns_car							boolean,
+    driver_license_types 				varchar(5)[],
+	job_allowance_country_ids			integer[],
+
+	CONSTRAINT education_level_validate 					CHECK ((education_level 	= 	ANY (ARRAY[0, 1, 2, 3, 4, 5, 6, 7]))),
+    CONSTRAINT vacancy_body_employment_type_validate 		CHECK ((employment_type 	=	ANY (ARRAY[0, 1, 2, 3, 4]) OR employment_type		= NULL)),
+    CONSTRAINT vacancy_body_work_schedule_type_validate 	CHECK ((work_schedule_type 	= 	ANY (ARRAY[0, 1, 2, 3, 4]) OR work_schedule_type	= NULL))
+);
+
+CREATE TABLE resume_to_user_citizenship (
+	resume_to_user_citizenship_id		serial			PRIMARY KEY,
+	resume_id							integer			REFERENCES resume(resume_id),
+	country_id							integer			DEFAULT 0
+);
+
+CREATE TABLE work_experience (
+	work_experience_id					serial			PRIMARY KEY,
+
+	hired_from							date			NOT NULL,
+	work_until							date,
+
+	company_name						varchar(250)	NOT NULL,
+	position							varchar(250)	NOT NULL,
+	obligations							text			NOT NULL
+);
+
+CREATE TABLE resume_to_work_experience (
+	resume_to_work_experience_id		serial			PRIMARY KEY,
+	resume_id							integer			REFERENCES resume(resume_id),
+	work_experience_id					integer			REFERENCES work_experience(work_experience_id)
+);
+
+CREATE TABLE resume_to_skill (
+	resume_to_skill_id 					serial 			PRIMARY KEY,
+	resume_id 							integer 		REFERENCES resume(resume_id),
+	skill_id 							integer 		REFERENCES skill(skill_id)
+);
+
+CREATE TABLE language_skill (
+	language_skill_id					serial			PRIMARY KEY,
+	language_id							integer			DEFAULT 0,
+	skill_level							integer			NOT NULL,
+
+	CONSTRAINT skill_level_validate 	CHECK ((skill_level = 	ANY (ARRAY[0, 1, 2, 3, 4, 5])))
+);
+
+CREATE TABLE resume_to_language_skill (
+	resume_to_language_skill_id			serial			PRIMARY KEY,
+	resume_id							integer			REFERENCES resume(resume_id),
+	language_skill_id					integer			REFERENCES language_skill(language_skill_id)
+);
+
+CREATE TABLE resume_to_specialization (
+	resume_to_specialization_id			serial			PRIMARY KEY,
+	resume_id							integer			REFERENCES resume(resume_id),
+	specialization_id					integer			REFERENCES specialization(specialization_id)
+);
+
+CREATE TABLE response (
+	response_id							serial			PRIMARY KEY,
+	response_date						timestamp		NOT NULL,
+	vacancy_id							integer			REFERENCES vacancy(vacancy_id),
+	resume_id							integer			REFERENCES resume(resume_id)
 );
