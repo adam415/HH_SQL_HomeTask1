@@ -31,7 +31,7 @@ CREATE TABLE company (
 	-- Только необходимое для вакансии
 	company_id 							serial 			PRIMARY KEY,
 	company_name 						varchar(150) 	NOT NULL,
-	company_image_url 					varchar(30) 	NOT NULL
+	company_image_url 					varchar(30) 	NULL
 );
 
 CREATE TABLE company_to_company_badge (
@@ -64,9 +64,9 @@ CREATE TABLE vacancy_body (
     area_id 							integer,
     address_id 							integer,
 	
-    work_experience 					integer 		NOT NULL 	DEFAULT 0,
-    work_schedule_type 					integer 		NOT NULL 	DEFAULT 0,
-    employment_type 					integer 		NOT NULL 	DEFAULT 0,
+    work_experience 					integer 		NULL	 	DEFAULT 0,
+    work_schedule_type 					integer 		NULL	 	DEFAULT 0,
+    employment_type 					integer 		NULL	 	DEFAULT 0,
 	
     vacancy_text						text,
 	
